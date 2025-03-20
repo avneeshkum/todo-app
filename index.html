@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        .delete, .hard-delete {
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .delete {
+            background: #ffc107;
+            color: black;
+        }
+        .delete:hover {
+            background: #e0a800;
+        }
+        .hard-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .hard-delete:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>ToDo List</h2>
+        <input type="text" id="title" placeholder="Task Title">
+        <input type="text" id="description" placeholder="Task Description">
+        <button onclick="addTask()">Add Task</button>
+        <div id="taskList"></div>
+    </div>
+
+    <script>
+        async function fetchTasks() {
+            const res = await fetch("http://localhost:5000/tasks");
+            const tasks = await res.json();
+            const taskList = document.getElementById("taskList");
+            taskList.innerHTML = "";
+
+            tasks.forEach(task => {
+                const taskItem = document.createElement("div");
+                taskItem.className = "task";
+                taskItem.innerHTML = `
+                    ${task.title} - ${task.description} 
+                    <button class='delete' onclick='softDeleteTask(${task.id})'>Soft Delete</button>
+                    <button class='hard-delete' onclick='hardDeleteTask(${task.id})'>Hard Delete</button>
+                `;
+                taskList.appendChild(taskItem);
+            });
+        }
+        
+        async function addTask() {
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            await fetch("http://localhost:5000/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, description, status: "pending" })
+            });
+            fetchTasks();
+        }
+        
+        async function softDeleteTask(id) {
+            await fetch(`http://localhost:5000/tasks/soft/${id}`, { method: "DELETE" });
+            fetchTasks();
+        }
+        
+        async function hardDeleteTask(id) {
+            await fetch(`http://localhost:5000/tasks/hard/${id}`, { method: "DELETE" });
+            fetchTasks();
+        }
+        
+        fetchTasks();
+    </script>
+</body>
+</html>
