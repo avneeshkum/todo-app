@@ -1,4 +1,4 @@
-require("dotenv").config(); 
+require("dotenv").config();
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
@@ -12,15 +12,15 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
+    password: process.env.DB_PASS, 
     database: process.env.DB_NAME
 });
 
 db.connect(err => {
     if (err) {
-        console.log("Database connection failed:", err.message);
+        console.error(" Database connection failed:", err.message);
     } else {
-        console.log("Database connected");
+        console.log(" Database connected successfully!");
     }
 });
 
@@ -59,12 +59,12 @@ app.delete("/tasks/soft/:id", (req, res) => {
 app.delete("/tasks/hard/:id", (req, res) => {
     db.query("DELETE FROM tasks WHERE id = ?", [req.params.id], (err) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: "Task permanently deleted!" });
+        res.json({ message: " Task permanently deleted!" });
     });
 });
 
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(` Server running on port ${PORT}`);
 });
