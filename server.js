@@ -10,17 +10,17 @@ app.use(bodyParser.json());
 
 // MySQL Connection
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS, 
-    database: process.env.DB_NAME
+    host: "localhost",
+    user: "",  // your username
+    password: "", //your password
+    database: "todo_db"
 });
 
 db.connect(err => {
     if (err) {
-        console.error(" Database connection failed:", err.message);
+        console.log("Database connection failed:", err.message);
     } else {
-        console.log(" Database connected successfully!");
+        console.log("Database connected");
     }
 });
 
@@ -59,12 +59,12 @@ app.delete("/tasks/soft/:id", (req, res) => {
 app.delete("/tasks/hard/:id", (req, res) => {
     db.query("DELETE FROM tasks WHERE id = ?", [req.params.id], (err) => {
         if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: " Task permanently deleted!" });
+        res.json({ message: "Task permanently deleted!" });
     });
 });
 
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(` Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
